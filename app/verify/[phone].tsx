@@ -1,5 +1,6 @@
 import {
-    Alert,
+  ActivityIndicator,
+  Alert,
   Platform,
   StyleSheet,
   Text,
@@ -15,7 +16,11 @@ import {
   useClearByFocusCell,
 } from "react-native-confirmation-code-field";
 import Colors from "@/constants/Colors";
-import { isClerkAPIResponseError, useSignIn, useSignUp } from "@clerk/clerk-expo";
+import {
+  isClerkAPIResponseError,
+  useSignIn,
+  useSignUp,
+} from "@clerk/clerk-expo";
 const CELL_COUNT = 6;
 const Page = () => {
   const { phone, signin } = useLocalSearchParams<{
@@ -23,8 +28,10 @@ const Page = () => {
     signin?: string;
   }>();
   const [code, setCode] = useState("");
-    const { signUp, setActive } = useSignUp();
-    const { signIn } = useSignIn();
+  const [loading, setLoading] = useState(false);
+  const [isResendCode, setIsResendCode] = useState(false);
+  const { signUp, setActive } = useSignUp();
+  const { signIn } = useSignIn();
 
   const ref = useBlurOnFulfill({ value: code, cellCount: CELL_COUNT });
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
@@ -34,117 +41,142 @@ const Page = () => {
 
   useEffect(() => {
     if (code.length === 6) {
-        if(signin === 'true'){
-            verifySignIn()
-        }else {
-            verifyCode()
-        }
+      if (signin === "true") {
+        verifySignIn();
+      } else {
+        verifyCode();
+      }
       //verify code
-      console.log('code',code);
+      console.log("code", code);
     }
   }, [code]);
 
   const verifyCode = async () => {
     try {
-        await signUp!.attemptPhoneNumberVerification({code})
-        await setActive!({session:signUp!.createdSessionId})
+      setLoading(true);
+      await signUp!.attemptPhoneNumberVerification({ code });
+      await setActive!({ session: signUp!.createdSessionId });
     } catch (error) {
-        console.log('error',JSON.stringify(error,null,2));
-        if(isClerkAPIResponseError(error)){
-            Alert.alert('Error',error.errors[0].message)
-        }
+      console.log("error", JSON.stringify(error, null, 2));
+      if (isClerkAPIResponseError(error)) {
+        Alert.alert("Error", error.errors[0].message);
+      }
     }
-
+    setLoading(false);
   };
 
   const verifySignIn = async () => {
     try {
-        await signIn!.attemptFirstFactor({
-            strategy:'phone_code',
-            code
-        })
-        await setActive!({session:signIn!.createdSessionId})
+      setLoading(true);
+
+      await signIn!.attemptFirstFactor({
+        strategy: "phone_code",
+        code,
+      });
+      await setActive!({ session: signIn!.createdSessionId });
     } catch (error) {
-        console.log('err',JSON.stringify(error,null,2));
-        if(isClerkAPIResponseError(error)){
-            Alert.alert('Error',error.errors[0].message)
-        }
+      console.log("err", JSON.stringify(error, null, 2));
+      if (isClerkAPIResponseError(error)) {
+        Alert.alert("Error", error.errors[0].message);
+      }
     }
+    setLoading(false);
   };
 
   const resendCode = async () => {
     try {
-        if(signin === 'true'){
-             const { supportedFirstFactors } = await signIn!.create({
-               identifier: phone!,
-             });
-             const firstPhoneFactor: any = supportedFirstFactors.find(
-               (factor: any) => {
-                 return factor.strategy === "phone_code";
-               }
-             );
-             const { phoneNumberId } = firstPhoneFactor;
-             await signIn!.prepareFirstFactor({
-               strategy: "phone_code",
-               phoneNumberId,
-             });
-        }else {
-              await signUp!.create({
-                phoneNumber:phone,
-              });
-              await signUp!.preparePhoneNumberVerification();
-        }
+      setIsResendCode(true);
+      if (signin === "true") {
+        const { supportedFirstFactors } = await signIn!.create({
+          identifier: phone!,
+        });
+        const firstPhoneFactor: any = supportedFirstFactors.find(
+          (factor: any) => {
+            return factor.strategy === "phone_code";
+          }
+        );
+        const { phoneNumberId } = firstPhoneFactor;
+        await signIn!.prepareFirstFactor({
+          strategy: "phone_code",
+          phoneNumberId,
+        });
+      } else {
+        await signUp!.create({
+          phoneNumber: phone,
+        });
+        await signUp!.preparePhoneNumberVerification();
+      }
     } catch (error) {
-        console.log("error", JSON.stringify(error, null, 2));
-        if (isClerkAPIResponseError(error)) {
-          Alert.alert("Error", error.errors[0].message);
-        }
+      console.log("error", JSON.stringify(error, null, 2));
+      if (isClerkAPIResponseError(error)) {
+        Alert.alert("Error", error.errors[0].message);
+      }
     }
+    setIsResendCode(false);
   };
 
   return (
-    <View style={styles.container}>
-      <Stack.Screen options={{ headerTitle: phone }} />
-      <Text style={styles.legal}>
-        We have sent you an SMS with a code to the number above.
-      </Text>
-      <Text style={styles.legal}>
-        To complete your phone number verification, please enter the 6-digit
-        activation code.
-      </Text>
+    <>
+      {loading && (
+        <View style={[StyleSheet.absoluteFill, styles.loading]}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <Text style={{ fontSize: 18, padding: 10 }}>Verify code...</Text>
+        </View>
+      )}
+      {!loading && (
+        <View style={styles.container}>
+          <Stack.Screen options={{ headerTitle: phone }} />
+          <Text style={styles.legal}>
+            We have sent you an SMS with a code to the number above.
+          </Text>
+          <Text style={styles.legal}>
+            To complete your phone number verification, please enter the 6-digit
+            activation code.
+          </Text>
 
-      <CodeField
-        ref={ref}
-        {...props}
-        value={code}
-        onChangeText={setCode}
-        cellCount={CELL_COUNT}
-        rootStyle={styles.codeFieldRoot}
-        keyboardType="number-pad"
-        textContentType="oneTimeCode"
-        
+          <CodeField
+            ref={ref}
+            {...props}
+            value={code}
+            onChangeText={setCode}
+            cellCount={CELL_COUNT}
+            rootStyle={styles.codeFieldRoot}
+            keyboardType="number-pad"
+            textContentType="oneTimeCode"
+            renderCell={({ index, symbol, isFocused }) => (
+              <View
+                // Make sure that you pass onLayout={getCellOnLayoutHandler(index)} prop to root component of "Cell"
+                onLayout={getCellOnLayoutHandler(index)}
+                key={index}
+                style={[styles.cellRoot, isFocused && styles.focusCell]}
+              >
+                <Text style={styles.cellText}>
+                  {symbol || (isFocused ? <Cursor /> : null)}
+                </Text>
+              </View>
+            )}
+          />
 
-        renderCell={({ index, symbol, isFocused }) => (
-          <View
-            // Make sure that you pass onLayout={getCellOnLayoutHandler(index)} prop to root component of "Cell"
-            onLayout={getCellOnLayoutHandler(index)}
-            key={index}
-            
-            style={[styles.cellRoot, isFocused && styles.focusCell]}
-          >
-            <Text style={styles.cellText}>
-              {symbol || (isFocused ? <Cursor /> : null)}
-            </Text>
-          </View>
-        )}
-      />
-
-      <TouchableOpacity style={styles.button} onPress={resendCode}>
-        <Text style={styles.buttonText}>
-          Didn't receive a verification code?
-        </Text>
-      </TouchableOpacity>
-    </View>
+          <TouchableOpacity style={styles.button} onPress={resendCode}>
+            {!isResendCode && (
+              <Text style={styles.buttonText}>
+                Didn't receive a verification code?
+              </Text>
+            )}
+            {isResendCode && (
+              <View style={{ flexDirection: "row" }}>
+                <Text
+                  style={{ fontSize: 18, padding: 10, color: Colors.primary }}
+                >
+                  Sending code again...
+                </Text>
+                <ActivityIndicator size="small" color={Colors.primary} />
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
+    </>
   );
 };
 
@@ -166,7 +198,7 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     alignItems: "center",
-    marginTop:20
+    marginTop: 20,
   },
   buttonText: {
     color: Colors.primary,
@@ -191,11 +223,18 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 30,
     textAlign: "center",
-    fontWeight:'100'
+    fontWeight: "100",
   },
   focusCell: {
     paddingBottom: 4,
     borderBottomColor: "#000",
     borderBottomWidth: 2,
+  },
+  loading: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 10,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

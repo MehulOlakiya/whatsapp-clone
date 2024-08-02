@@ -47,7 +47,11 @@
     "react-native-screens": "3.31.1",
     "react-native-section-alphabet-list": "^3.0.0",
     "react-native-web": "~0.19.10",
-    "zeego": "^1.10.0"
+    "zeego": "^1.10.0",
+    "expo-av": "~14.0.6",
+    "expo-media-library": "~16.0.4",
+    "expo-image": "~1.12.13",
+    "expo-symbols": "~0.1.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

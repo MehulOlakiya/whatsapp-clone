@@ -23,6 +23,7 @@ const Layout = () => {
           },
           tabBarLabelStyle: {
             fontSize: 14,
+            marginBottom: 10,
           },
           tabBarActiveTintColor: Colors.primary,
           tabBarInactiveBackgroundColor: Colors.background,
@@ -41,6 +42,10 @@ const Layout = () => {
             tabBarIcon: ({ size, color }) => (
               <MaterialIcons name="update" size={size} color={color} />
             ),
+            tabBarStyle: {
+              backgroundColor: Colors.background,
+              height: 60,
+            },
           }}
         />
         <Tabs.Screen
@@ -55,6 +60,10 @@ const Layout = () => {
                 color={color}
               />
             ),
+            tabBarStyle: {
+              backgroundColor: Colors.background,
+              height: 60,
+            },
           }}
         />
         <Tabs.Screen
@@ -64,6 +73,10 @@ const Layout = () => {
             tabBarIcon: ({ size, color }) => (
               <MaterialIcons name="people" size={size} color={color} />
             ),
+            tabBarStyle: {
+              backgroundColor: Colors.background,
+              height: 60,
+            },
           }}
         />
         <Tabs.Screen
@@ -77,6 +90,7 @@ const Layout = () => {
             tabBarStyle: {
               backgroundColor: Colors.background,
               display: segments[2] === "[id]" ? "none" : "flex",
+              height: 60,
             },
           }}
         />
@@ -88,6 +102,10 @@ const Layout = () => {
             tabBarIcon: ({ size, color }) => (
               <Ionicons name="cog" size={size} color={color} />
             ),
+            tabBarStyle: {
+              backgroundColor: Colors.background,
+              height: 60,
+            },
           }}
         />
       </Tabs>

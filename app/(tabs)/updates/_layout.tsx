@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { Link, Stack } from "expo-router";
+import { Link, router, Stack } from "expo-router";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -34,7 +34,7 @@ const Layout = () => {
           //   },
           headerRight: () => (
             <View style={{ flexDirection: "row", gap: 20 }}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push("/(models)/camera")}>
                 <Ionicons
                   name="camera-outline"
                   color={Colors.primary}

@@ -11,7 +11,13 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
-import { View, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import Page from "./index";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -44,7 +50,7 @@ const InitialLayout = () => {
   });
 
   const router = useRouter();
-  const { isLoaded, isSignedIn } = useAuth();
+  let { isLoaded, isSignedIn } = useAuth();
   const segments = useSegments();
 
   useEffect(() => {
@@ -59,6 +65,7 @@ const InitialLayout = () => {
 
   useEffect(() => {
     console.log("isSignedIn", isSignedIn);
+    isSignedIn = true;
     if (!isLoaded) return;
     const inAuthGroup = segments[0] === "(tabs)";
     if (isSignedIn && !inAuthGroup) {
@@ -69,7 +76,27 @@ const InitialLayout = () => {
   }, [isSignedIn]);
 
   if (!loaded || !isLoaded) {
-    return <Text>Loading...</Text>;
+    // return (
+    //   <>
+    //     <StatusBar style="dark" />
+    //     <View
+    //       style={[
+    //         StyleSheet.absoluteFill,
+    //         {
+    //           ...StyleSheet.absoluteFillObject,
+    //           zIndex: 10,
+    //           backgroundColor: "#fff",
+    //           justifyContent: "center",
+    //           alignItems: "center",
+    //         },
+    //       ]}
+    //     >
+    //       <ActivityIndicator size="large" color={Colors.primary} />
+    //       <Text style={{ fontSize: 18, padding: 10 }}>Please Wait...</Text>
+    //     </View>
+    //   </>
+    // );
+    SplashScreen.hideAsync();
   }
 
   return (
@@ -101,28 +128,31 @@ const InitialLayout = () => {
         />
         <Stack.Screen
           name="(models)/new-chat"
-          options={{
-            //   headerShown: false,
-            presentation: "modal",
-            title: "New Chat",
-            //   headerTransparent: true,
-            headerStyle: {
-              backgroundColor: Colors.background,
-            },
-            headerSearchBarOptions: {
-              placeholder: "Search name or number",
-              hideWhenScrolling: false,
-            },
-            headerRight: () => (
-              <TouchableOpacity>
-                <Ionicons
-                  name="ellipsis-vertical"
-                  size={24}
-                  color={Colors.gray}
-                />
-              </TouchableOpacity>
-            ),
-          }}
+          // options={{
+          //   //   headerShown: false,
+          //   presentation: "modal",
+          //   title: "New Chat",
+          //   //   headerTransparent: true,
+          //   headerStyle: {
+          //     backgroundColor: Colors.background,
+          //   },
+          //   headerSearchBarOptions: {
+          //     placeholder: "Search name or number",
+          //     hideWhenScrolling: false,
+          //     headerIconColor:Colors.primary
+
+          //   },
+
+          //   headerRight: () => (
+          //     <TouchableOpacity>
+          //       <Ionicons
+          //         name="ellipsis-vertical"
+          //         size={24}
+          //         color={Colors.primary}
+          //       />
+          //     </TouchableOpacity>
+          //   ),
+          // }}
         />
         <Stack.Screen
           name="(models)/search-chat"
@@ -148,7 +178,6 @@ const RootLayoutNav = () => {
       tokenCache={tokenCache}
     >
       <InitialLayout />
-      <StatusBar style="inverted" backgroundColor="#000" />
     </ClerkProvider>
   );
 };

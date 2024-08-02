@@ -13,6 +13,7 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { defaultStyles } from "@/constants/Styles";
 import StoryImage from "@/components/StoryImage";
+import { router } from "expo-router";
 
 const Page = () => {
   const data = contacts.slice(0, 5);
@@ -112,7 +113,11 @@ const Page = () => {
                     borderWidth: 2,
                   }}
                 /> */}
-                  <StoryImage stories={5} image={item.img} key={index} />
+                  <StoryImage
+                    stories={5}
+                    image={item.img}
+                    key={Math.random().toString()}
+                  />
                   <View style={{ gap: 2, justifyContent: "center" }}>
                     <Text
                       style={{
@@ -175,7 +180,7 @@ const Page = () => {
               data={viewUpdateData}
               contentInsetAdjustmentBehavior="automatic"
               scrollEnabled={false}
-              keyExtractor={(item) => item.desc}
+              keyExtractor={(item) => item.first_name}
               renderItem={({ item, index }) => (
                 <View
                   style={{
@@ -347,12 +352,11 @@ const Page = () => {
                 <TouchableOpacity
                   style={{
                     borderRadius: 20,
-                    borderWidth: 1,
-                    borderColor: Colors.lightGray,
                     paddingVertical: 8,
                     paddingHorizontal: 18,
                     alignItems: "center",
                     justifyContent: "center",
+                    backgroundColor: "#dee7ff",
                   }}
                 >
                   <Text
@@ -372,7 +376,7 @@ const Page = () => {
             style={{
               flex: 1,
               marginLeft: 20,
-              width: 200,
+              width: 160,
               marginTop: 15,
             }}
           >
@@ -381,8 +385,8 @@ const Page = () => {
                 borderRadius: 24,
                 borderWidth: 1,
                 borderColor: Colors.lightGray,
-                paddingVertical: 14,
-                paddingHorizontal: 16,
+                paddingVertical: 10,
+                paddingHorizontal: 12,
                 alignItems: "center",
                 justifyContent: "center",
               }}
@@ -436,7 +440,9 @@ const Page = () => {
             padding: 10,
           }}
         >
-          <Ionicons name="camera-outline" size={30} color="#fff" />
+          <TouchableOpacity onPress={() => router.push("/(models)/camera")}>
+            <Ionicons name="camera-outline" size={30} color="#fff" />
+          </TouchableOpacity>
         </View>
       </View>
     </>

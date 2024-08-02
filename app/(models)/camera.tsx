@@ -8,36 +8,37 @@ import {
   FlashMode,
 } from "expo-camera";
 import BottomRowTools from "@/components/camera/BottomRowTools";
-// import MainRowActions from "@/components/MainRowActions";
-// import PictureView from "@/components/PictureView";
+import MainRowActions from "@/components/camera/MainRowActions";
+import PictureView from "@/components/camera/PictureView";
 import Animated, {
   FadeIn,
   FadeOut,
   LinearTransition,
 } from "react-native-reanimated";
 import CameraTools from "@/components/camera/CameraTools";
+import { useRef, useState } from "react";
 // import * as WebBrowser from "expo-web-browser";
 // import QRCodeButton from "@/components/QRCodeButton";
-// import VideoViewComponent from "@/components/camera/VideoView";
+import VideoViewComponent from "@/components/camera/VideoView";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Ionicons } from "@expo/vector-icons";
 
 const CameraComponent = () => {
-  const cameraRef = React.useRef<CameraView>(null);
-  const [cameraMode, setCameraMode] = React.useState<CameraMode>("picture");
-  const [cameraTorch, setCameraTorch] = React.useState<boolean>(false);
-  const [cameraFlash, setCameraFlash] = React.useState<FlashMode>("off");
-  const [cameraFacing, setCameraFacing] = React.useState<"front" | "back">(
-    "back"
-  );
-  const [cameraZoom, setCameraZoom] = React.useState<number>(0);
-  const [picture, setPicture] = React.useState<string>(""); // "https://picsum.photos/seed/696/3000/2000"
-  const [video, setVideo] = React.useState<string>(
+  const cameraRef = useRef<CameraView>(null);
+  const [cameraMode, setCameraMode] = useState<CameraMode>("picture");
+  const [cameraTorch, setCameraTorch] = useState<boolean>(false);
+  const [cameraFlash, setCameraFlash] = useState<FlashMode>("off");
+  const [cameraFacing, setCameraFacing] = useState<"front" | "back">("back");
+  const [cameraZoom, setCameraZoom] = useState<number>(0);
+  const [picture, setPicture] = useState<string>(""); // "https://picsum.photos/seed/696/3000/2000"
+  const [video, setVideo] = useState<string>(
     "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
   ); //  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
 
-  const [isBrowsing, setIsBrowsing] = React.useState<boolean>(false);
-  const [isRecording, setIsRecording] = React.useState<boolean>(false);
+  const [isBrowsing, setIsBrowsing] = useState<boolean>(false);
+  const [isRecording, setIsRecording] = useState<boolean>(false);
   const [qrCodeDetected, setQrCodeDetected] = React.useState<string>("");
-  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   async function handleTakePicture() {
     const response = await cameraRef.current?.takePictureAsync({});
@@ -80,7 +81,7 @@ const CameraComponent = () => {
   };
 
   if (isBrowsing) return <></>;
-  //   if (picture) return <PictureView picture={picture} setPicture={setPicture} />;
+  if (picture) return <PictureView picture={picture} setPicture={setPicture} />;
   //   if (video) return <VideoViewComponent video={video} setVideo={setVideo} />;
   return (
     <Animated.View
@@ -102,7 +103,7 @@ const CameraComponent = () => {
         onCameraReady={() => console.log("camera is ready")}
       >
         <SafeAreaView style={{ flex: 1 }}>
-          <View style={{ flex: 1, padding: 6 }}>
+          <View style={{ flex: 1, padding: 6, marginTop: 80, marginRight: 20 }}>
             <CameraTools
               cameraZoom={cameraZoom}
               cameraFlash={cameraFlash}
@@ -112,11 +113,18 @@ const CameraComponent = () => {
               setCameraTorch={setCameraTorch}
               setCameraFlash={setCameraFlash}
             />
+            <MainRowActions
+              isRecording={isRecording}
+              handleTakePicture={
+                cameraMode === "picture" ? handleTakePicture : toggleRecord
+              }
+              cameraMode={cameraMode}
+            />
 
-            <BottomRowTools
+            {/* <BottomRowTools
               cameraMode={cameraMode}
               setCameraMode={setCameraMode}
-            />
+            /> */}
           </View>
         </SafeAreaView>
       </CameraView>

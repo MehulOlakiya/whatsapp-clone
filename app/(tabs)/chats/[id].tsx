@@ -1,7 +1,14 @@
-import { StyleSheet, Text, View, Image, ImageBackground } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ImageBackground,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import messageData from "@/assets/data/messages.json";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import chats from "@/assets/data/chats.json";
 import {
   Bubble,
@@ -127,6 +134,9 @@ const Page = () => {
                 right: {
                   color: "#000",
                 },
+                left: {
+                  color: "#000",
+                },
               }}
               wrapperStyle={{
                 left: {
@@ -148,6 +158,7 @@ const Page = () => {
               justifyContent: "center",
               gap: 15,
               paddingHorizontal: 15,
+              marginBottom: 10,
             }}
           >
             {text.length > 0 && (
@@ -162,11 +173,16 @@ const Page = () => {
             )}
             {text.length === 0 && (
               <>
-                <Ionicons
-                  name="camera-outline"
-                  color={Colors.primary}
-                  size={28}
-                />
+                <TouchableOpacity
+                  onPress={() => router.push("/(models)/camera")}
+                >
+                  <Ionicons
+                    name="camera-outline"
+                    color={Colors.primary}
+                    size={28}
+                  />
+                </TouchableOpacity>
+
                 <Ionicons name="mic-outline" color={Colors.primary} size={28} />
               </>
             )}
@@ -180,7 +196,7 @@ const Page = () => {
             renderActions={() => (
               <View
                 style={{
-                  height: 45,
+                  height: 60,
                   justifyContent: "center",
                   alignItems: "center",
                   left: 6,
@@ -220,6 +236,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     fontSize: 16,
     marginVertical: 4,
+    marginBottom: 13,
     // paddingTop: 8,
   },
 });
